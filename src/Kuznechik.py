@@ -1,12 +1,10 @@
 from src.Byte import Byte
 from src.ByteString import ByteString
 from typing import Tuple, List
-import base64
-import codecs as ccs
+from src.converter import *
 
 
 class Kuznechik:
-    BLOCK_LEN = 128
     text: List[ByteString]
     new_text: List[str]
     key: str
@@ -34,35 +32,23 @@ class Kuznechik:
 
     @classmethod
     def converter(cls, text: str, origin: str, to: str):
-        new_text = ''
-        if origin == to:
-            return text
-
-        if origin == 'hex':
-            new_text = ccs.decode(text, "hex").decode('utf-8')
+        if origin == 'text':
+            if to == 'hex':
+                return text_to_hex(text)
             if to == 'base64':
-                new_text = new_text.encode('utf-8')
-                new_text = base64.b64encode(new_text)
-                new_text = new_text.decode('utf-8')
-
-        elif origin == 'text':
-            new_text = text.encode('utf-8')
+                return text_to_base64(text)
+        if origin == 'hex':
+            if to == 'text':
+                return hex_to_text(text)
+            if to == 'base64':
+                return hex_to_base64(text)
             if to == 'hex':
-                new_text = new_text.hex()
-                new_text += '20' * ((32 - len(new_text)) % 32 // 2)
-            elif to == 'base64':
-                new_text = base64.b64encode(new_text)
-                new_text = new_text.decode('utf-8')
-
-        elif origin == 'base64':
-            new_text = text.encode('utf-8')
-            new_text = base64.b64decode(new_text)
-            new_text = new_text.decode('utf-8')
+                return hex_to_hex(text)
+        if origin == 'base64':
+            if to == 'text':
+                return base64_to_text(text)
             if to == 'hex':
-                new_text = new_text.encode('utf-8')
-                new_text = new_text.hex()
-                new_text += '20' * ((32 - len(new_text)) % 32 // 2)
-        return new_text
+                return base64_to_hex(text)
 
     PI_LIST = (252, 238, 221, 17, 207, 110, 49, 22, 251, 196, 250, 218, 35, 197, 4, 77, 233, 119, 240, 219, 147, 46,
                153, 186, 23, 54, 241, 187, 20, 205, 95, 193, 249, 24, 101, 90, 226, 92, 239, 33, 129, 28, 60, 66,
